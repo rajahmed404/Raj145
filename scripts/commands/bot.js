@@ -24,6 +24,34 @@ module.exports.config = {
   cooldowns: 5,
 };
 
+module.exports.handleReply = async function ({ api, event, handleReply }) {
+    try {
+    const apiUrl = await getApiUrl();
+      const response = await axios.get(`${apiUrl}/sim?type=ask&ask=${encodeURIComponent(event.body)}`);
+      console.log(response.data);
+      const result = response.data.data.msg;
+
+
+      api.sendMessage(result, event.threadID, (error, info) => {
+        if (error) {
+          console.error('Error replying to user:', error);
+          return api.sendMessage('An error occurred while processing your request. Please try again later.', event.threadID, event.messageID);
+        }
+        global.client.handleReply.push({
+          type: 'reply',
+          name: this.config.name,
+          messageID: info.messageID,
+          author: event.senderID,
+          head: event.body
+        });
+      }, event.messageID);
+
+    } catch (error) {
+      console.error('Error in handleReply:', error);
+      api.sendMessage('An error occurred while processing your request. Please try again later.', event.threadID, event.messageID);
+    }
+}
+
 module.exports.run = async function ({ api, event, args, Users }) {
   const senderName = await Users.getNameUser(event.senderID);
   let input = args.join(" ").trim();
@@ -63,14 +91,14 @@ module.exports.run = async function ({ api, event, args, Users }) {
 
   const fallbackReplies = [
     "আমি এখন রাজ বস এর সাথে বিজি আছি",
-    "চিপায় আসো জান প্রেমের টিকা দেই 😘?",
-    "I love you baby meye মেয়ে হলে উম্মা দেও 🫣",
-    "বস রাজ ও তোমাকে অনেক ভালোবাসে-😍💋💝",
+    "what are you asking me to do?",
+    "I love you baby meye hole chipay aso",
+    "Love you 3000-😍💋💝",
     "ji bolen ki korte pari ami apnar jonno?",
-    "আমাকে না ডেকে আমার বস রাজকে ডাকেন! link: https://www.facebook.com/share/1CSBpWz2Vt/",
-    "রাজ বসের পক্ষ থেকে তোমাকে একটা উম্মা😘😘",
+    "আমাকে না ডেকে আমার বস রাজকে ডাকেন! link: https://www.facebook.com/61574869774986",
+    "Hmm jan ummah😘😘",
     "তুমি কি আমাকে ডাকলে বন্ধু 🤖?",
-    "আমাকে না ডেকে বস রাজের সাথে চিপায় যাও🤣 🤖",
+    "ভালোবাসি তোমাকে 🤖",
     "Hi, 🤖 i can help you~~~~"
   ];
 
@@ -120,10 +148,19 @@ module.exports.run = async function ({ api, event, args, Users }) {
       }, event.threadID, event.messageID);
     }
 
-    return api.sendMessage({
-      body: `╭╼|━━━━━━━━━━━━━━|╾╮\n${replyPrefix}💬 ${reply}\n╰╼|━━━━━━━━━━━━━━|╾╯`,
-      mentions
-    }, event.threadID, event.messageID);
+    return api.sendMessage({ body: reply }, event.threadID, (error, info) => {
+          if (error) {
+            return api.sendMessage('An error occurred while processing your request. Please try again later.', event.threadID, event.messageID);
+          }
+
+          global.client.handleReply.push({
+            type: 'reply',
+            name: this.config.name,
+            messageID: info.messageID,
+            author: event.senderID,
+            head: input,
+          });
+        }, event.messageID);
 
   } catch (err) {
     console.error("❌ API error:", err.message);

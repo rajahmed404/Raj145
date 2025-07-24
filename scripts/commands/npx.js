@@ -22,7 +22,7 @@ module.exports.handleEvent = function ({ api, event }) {
     const msg = {
       body: "╭╼|━━━━━━━━━━━━━━|╾╮\n" +
             "╰╼|━━━━━━━━━━━━━━|╾╯",
-      attachment: fs.createReadStream(__dirname + `/Joy/JOY12.mp3`)
+      attachment: fs.createReadStream(__dirname + `/Raj/JOY12.mp3`)
     };
     api.sendMessage(msg, threadID, () => {
       api.setMessageReaction("🤡", messageID, () => {}, true);

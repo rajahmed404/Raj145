@@ -34,9 +34,13 @@ module.exports.run = async function ({ api, event }) {
 
     const msg =
 `╭╼|━━━━━━━━━━━━━━|╾╮
+  𝐊𝐈𝐂𝐊 𝐈𝐃 𝐈𝐍𝐅𝐎𝐑𝐌𝐀𝐓𝐈𝐎𝐍
 👣 ${kickedName} (${kickedID})
 🔗 https://facebook.com/${kickedID}
+╰╼|━━━━━━━━━━━━━━|╾╯
 
+╭╼|━━━━━━━━━━━━━━|╾╮
+𝐊𝐈𝐂𝐊 𝐁𝐘 𝐈𝐍𝐅𝐎𝐑𝐌𝐀𝐓𝐈𝐎𝐍
 👮‍♂️ @${kickerName} (${kickerID})
 🔗 https://facebook.com/${kickerID}
 

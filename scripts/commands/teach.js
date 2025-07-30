@@ -34,7 +34,7 @@ async function getUserName(Users, userID) {
 
 module.exports.config = {
   name: "teach",
-  version: "1.0.7",
+  version: "1.0.8",
   permission: 0,
   prefix: true,
   credits: "Joy Ahmed",
@@ -43,13 +43,14 @@ module.exports.config = {
   usages: "bot [message] OR teach [question] - [answer]",
   cooldowns: 5,
 };
-module.exports.onStart = async function() {
+
+module.exports.onStart = async function () {
   // No initialization needed for now
 };
 
-module.exports.run = async function({ api, event, args, Users }) {
+module.exports.run = async function ({ api, event, args, Users }) {
   try {
-    const link = `${await baseApiUrl()}/baby`;
+    const link = `${await baseApiUrl()}/teach`; // ✅ updated endpoint
     const input = args.join(" ").toLowerCase();
     const uid = event.senderID;
 
@@ -80,13 +81,19 @@ module.exports.run = async function({ api, event, args, Users }) {
     saveLocalDB(localDB);
 
     // Save remotely
-    const response = await axios.get(`${link}?teach=${encodeURIComponent(trigger)}&reply=${encodeURIComponent(replies.join(','))}&senderID=${uid}`);
-    const name = await getUserName(Users, response.data.teacher || uid);
+    let teacherName = "unknown";
+    try {
+      const res = await axios.get(`${link}?teach=${encodeURIComponent(trigger)}&reply=${encodeURIComponent(replies.join(','))}&senderID=${uid}`);
+      teacherName = await getUserName(Users, res.data.teacher || uid);
+    } catch (err) {
+      console.warn("⚠️ Remote API failed, continuing with local save only");
+      teacherName = await getUserName(Users, uid);
+    }
 
     return api.sendMessage(
 `╭╼|━━━━━━━━━━━━━━|╾╮
 ✅ নতুন ট্রিগার শেখানো হয়েছে!
-👤 শিক্ষক: ${name}
+👤 শিক্ষক: ${teacherName}
 🔑 ট্রিগার: ${trigger}
 💬 রেপ্লাই: ${replies.join(", ")}
 ╰╼|━━━━━━━━━━━━━━|╾╯`,

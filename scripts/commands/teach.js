@@ -1,108 +1,60 @@
-const axios = require('axios');
-const fs = require("fs");
-const path = require("path");
+const axios = require("axios");
 
-const baseApiUrl = async () => {
-  const base = await axios.get(`https://raw.githubusercontent.com/JUBAED-AHMED-JOY/Joy/main/api.json`);
-  return base.data.api;
-};
+const API_CONFIG_URL = "https://raw.githubusercontent.com/JUBAED-AHMED-JOY/Joy/main/api.json";
 
-const localDbPath = path.join(__dirname, "..", "localTeachDB.json");
-
-function loadLocalDB() {
-  if (!fs.existsSync(localDbPath)) {
-    fs.writeFileSync(localDbPath, JSON.stringify({}), "utf-8");
+async function getApiUrl() {
+  try {
+    const res = await axios.get(API_CONFIG_URL);
+    return res.data.api;
+  } catch (e) {
+    console.error("❌ Failed to fetch API URL from GitHub:", e.message);
+    return null;
   }
-  const raw = fs.readFileSync(localDbPath, "utf-8");
-  return JSON.parse(raw);
-}
-
-function saveLocalDB(db) {
-  fs.writeFileSync(localDbPath, JSON.stringify(db, null, 2), "utf-8");
-}
-
-async function getUserName(Users, userID) {
-  if (typeof Users.getData === "function") {
-    const data = await Users.getData(userID);
-    return data && data.name ? data.name : "unknown";
-  }
-  if (typeof Users.getName === "function") {
-    return await Users.getName(userID);
-  }
-  return "unknown";
 }
 
 module.exports.config = {
   name: "teach",
-  version: "1.0.8",
+  version: "1.0.0",
   permission: 0,
   prefix: true,
   credits: "Joy Ahmed",
-  description: "Chatbot with teach system using API from GitHub config",
+  description: "Teach Joy AI with new replies (using API)",
   category: "fun",
-  usages: "bot [message] OR teach [question] - [answer]",
+  usages: "teach <question> - <answer>",
   cooldowns: 5,
 };
 
-module.exports.onStart = async function () {
-  // No initialization needed for now
-};
+module.exports.run = async function ({ api, event, args }) {
+  const input = args.join(" ").trim();
 
-module.exports.run = async function ({ api, event, args, Users }) {
-  try {
-    const link = `${await baseApiUrl()}/teach`; // ✅ updated endpoint
-    const input = args.join(" ").toLowerCase();
-    const uid = event.senderID;
-
-    if (!input.includes(" - ")) {
-      return api.sendMessage(
-        "❌ Usage: .teach <trigger> - <reply1>, <reply2>, <reply3>...\nExample: .teach hello - Hi!, Hello there!",
-        event.threadID,
-        event.messageID
-      );
-    }
-
-    const [triggerRaw, repliesRaw] = input.split(" - ");
-    const trigger = triggerRaw.trim();
-    const replies = repliesRaw.split(",").map(r => r.trim()).filter(Boolean);
-
-    if (!trigger || replies.length === 0) {
-      return api.sendMessage(
-        "❌ Invalid format. Provide trigger and at least one reply.\nExample: .teach hello - Hi!, Hello there!",
-        event.threadID,
-        event.messageID
-      );
-    }
-
-    // Save locally
-    let localDB = loadLocalDB();
-    if (!localDB[trigger]) localDB[trigger] = [];
-    localDB[trigger].push(...replies);
-    saveLocalDB(localDB);
-
-    // Save remotely
-    let teacherName = "unknown";
-    try {
-      const res = await axios.get(`${link}?teach=${encodeURIComponent(trigger)}&reply=${encodeURIComponent(replies.join(','))}&senderID=${uid}`);
-      teacherName = await getUserName(Users, res.data.teacher || uid);
-    } catch (err) {
-      console.warn("⚠️ Remote API failed, continuing with local save only");
-      teacherName = await getUserName(Users, uid);
-    }
-
+  if (!input.includes(" - ")) {
     return api.sendMessage(
-`╭╼|━━━━━━━━━━━━━━|╾╮
-✅ নতুন ট্রিগার শেখানো হয়েছে!
-👤 শিক্ষক: ${teacherName}
-🔑 ট্রিগার: ${trigger}
-💬 রেপ্লাই: ${replies.join(", ")}
-╰╼|━━━━━━━━━━━━━━|╾╯`,
+      "❌ সঠিক ফরম্যাট ব্যবহার করুন:\nteach <question> - <answer>\nউদাহরণ: teach তুমি কে? - আমি জয় বট 🤖",
       event.threadID,
       event.messageID
     );
+  }
 
-  } catch (e) {
-    console.error('Error in .teach command:', e);
-    return api.sendMessage(`❌ Error: ${e.message}`, event.threadID, event.messageID);
+  const [question, answer] = input.split(" - ").map(str => str.trim());
+
+  if (!question || !answer) {
+    return api.sendMessage("❌ প্রশ্ন বা উত্তর ফাঁকা রাখা যাবে না!", event.threadID, event.messageID);
+  }
+
+  const apiUrl = await getApiUrl();
+  if (!apiUrl) {
+    return api.sendMessage("❌ API URL পাওয়া যায়নি। পরে আবার চেষ্টা করুন।", event.threadID, event.messageID);
+  }
+
+  try {
+    await axios.get(`${apiUrl}/sim?type=teach&ask=${encodeURIComponent(question)}&ans=${encodeURIComponent(answer)}&senderID=${event.senderID}`);
+    return api.sendMessage(
+      `╭╼|━━━━━━━━━━━━━━|╾╮\n✅ শেখানো হয়েছে!\n❓ প্রশ্ন: ${question}\n💬 উত্তর: ${answer}\n╰╼|━━━━━━━━━━━━━━|╾╯`,
+      event.threadID,
+      event.messageID
+    );
+  } catch (err) {
+    console.error("❌ Teach API error:", err.message);
+    return api.sendMessage("❌ শেখাতে সমস্যা হয়েছে। পরে আবার চেষ্টা করুন।", event.threadID, event.messageID);
   }
 };

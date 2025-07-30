@@ -34,15 +34,15 @@ async function getUserName(Users, userID) {
 
 module.exports.config = {
   name: "teach",
-  version: "1.0",
-  credit: "Joy",
-  Permssion: 0,
+  version: "1.0.7",
+  permission: 0,
   prefix: true,
-  description: "Local + remote teach system with .teach command",
-  Category: "chat",
-  usages: ".teach [trigger] - [reply1], [reply2], [reply3]..."
+  credits: "Joy Ahmed",
+  description: "Chatbot with teach system using API from GitHub config",
+  category: "fun",
+  usages: "bot [message] OR teach [question] - [answer]",
+  cooldowns: 5,
 };
-
 module.exports.onStart = async function() {
   // No initialization needed for now
 };

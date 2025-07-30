@@ -1,9 +1,9 @@
 module.exports.config = {
   name: "kicknotice",
   eventType: ["log:unsubscribe"],
-  version: "1.2.0",
+  version: "2.1.0",
   credits: "Joy Ahmed",
-  description: "Show who kicked whom with UID, tag, date & profile link"
+  description: "Minimal kick notice with tag, UID, date, and profile link"
 };
 
 module.exports.run = async function ({ api, event }) {
@@ -22,7 +22,6 @@ module.exports.run = async function ({ api, event }) {
     const kickedName = kickedUser?.name || "Unknown";
     const kickerName = kickerUser?.name || "Unknown";
 
-    // 🇧🇩 Bangladesh time
     const date = new Date().toLocaleString("en-GB", {
       timeZone: "Asia/Dhaka",
       weekday: "long",
@@ -35,16 +34,13 @@ module.exports.run = async function ({ api, event }) {
 
     const msg =
 `╭╼|━━━━━━━━━━━━━━|╾╮
-👤 𝗞𝗶𝗰𝗸 𝗔𝗹𝗲𝗿𝘁
-👣 Kicked: ${kickedName}
-🆔 UID: ${kickedID}
-🔗 Profile: https://facebook.com/${kickedID}
+👣 ${kickedName} (${kickedID})
+🔗 https://facebook.com/${kickedID}
 
-👮‍♂️ Kicked By: @${kickerName}
-🆔 UID: ${kickerID}
-🔗 Profile: https://facebook.com/${kickerID}
+👮‍♂️ @${kickerName} (${kickerID})
+🔗 https://facebook.com/${kickerID}
 
-🕒 Date: ${date}
+🕒 ${date}
 ╰╼|━━━━━━━━━━━━━━|╾╯`;
 
     return api.sendMessage({
@@ -54,7 +50,7 @@ module.exports.run = async function ({ api, event }) {
         id: kickerID
       }]
     }, threadID);
-  } catch (e) {
-    console.error("❌ KickNotice Error:", e);
+  } catch (err) {
+    console.error("❌ KickNotice Error:", err);
   }
 };

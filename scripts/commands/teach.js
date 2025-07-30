@@ -36,11 +36,10 @@ module.exports.config = {
   name: "teach",
   version: "1.0",
   credit: "Joy",
-  cooldowns: 0,
   Permssion: 0,
-  description: "Local + remote teach system with .teach command",
   prefix: true,
-  commandCategory: "chat",
+  description: "Local + remote teach system with .teach command",
+  Category: "chat",
   usages: ".teach [trigger] - [reply1], [reply2], [reply3]..."
 };
 

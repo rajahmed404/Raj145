@@ -37,21 +37,20 @@ function getVideoID(url) {
     return match ? match[1] : null;
 }
 
-const config = {
+module.exports.config = {
     name: "sing2",
-    author: "Mesbah Saxx",
-    credits: "Mesbah Saxx",
-    version: "1.2.0",
-    role: 0,
+    version: "2.1.0",
+    aliases: [ "music", "play"],
+    credits: "dipto",
+    countDown: 5,
     hasPermssion: 0,
-    description: "",
-    usePrefix: true,
-    prfix: true,
+    description: "Download audio from YouTube",
     category: "media",
     commandCategory: "media",
-    cooldowns: 5,
-    countDown: 5,
-};
+    usePrefix: true,
+    prefix: true,
+    usages: "{pn} [<song name>|<song link>]:"+ "\n   Example:"+"\n{pn} chipi chipi chapa chapa"
+  }
 
 async function onStart({ api, args, event }) {
     try {

@@ -20,7 +20,7 @@ const WA_IMG = path.join(IMAGE_DIR, "wa.jpg");
 
 const imageUrls = {
   salam: "https://drive.google.com/uc?id=1HuRT_EHPCc0F5RnUwl2n53WW2TfbY6hR",
-  wa: "https://drive.google.com/uc?id=1Hv92IqK-9AYhWs-P8N4vz5DmMz0Ko7iK"
+  wa: "https://drive.google.com/uc?id=1WF_yp5tJmc6eHqtCBDBbgezHnaTVNs9K"
 };
 
 module.exports.onLoad = async () => {

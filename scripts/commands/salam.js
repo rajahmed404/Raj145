@@ -67,7 +67,7 @@ module.exports.handleEvent = async function ({ api, event }) {
     if (salamRegex.test(msg)) {
       const text =
 `╭╼|━━━━━━━━━━━━━━|╾╮
-🤲 ওয়া আলাইকুমুস সালাম 🤍
+🤲 ওয়ালাইকুম আসসালাম 🤍
 ╰╼|━━━━━━━━━━━━━━|╾╯`;
       return api.sendMessage(
         { body: text, attachment: fs.createReadStream(WA_IMG) },

@@ -1,9 +1,9 @@
 module.exports.config = {
     name: "join",
     eventType: ["log:subscribe"],
-    version: "1.0.1",
+    version: "1.0.2",
     credits: "CatalizCS | Fixed by Raj",
-    description: "Notify bot or group member with random gif/photo/video",
+    description: "Notify when bot or member joins, with random gif/photo/video",
     dependencies: {
         "fs-extra": "",
         "path": "",
@@ -15,23 +15,22 @@ module.exports.onLoad = function () {
     const { existsSync, mkdirSync } = global.nodemodule["fs-extra"];
     const { join } = global.nodemodule["path"];
 
-    const path1 = join(__dirname, "cache", "joinGif", "randomgif");
-    if (!existsSync(path1)) mkdirSync(path1, { recursive: true });
-
-    return;
-}
+    const gifFolder = join(__dirname, "cache", "joinGif", "randomgif");
+    if (!existsSync(gifFolder)) mkdirSync(gifFolder, { recursive: true });
+};
 
 module.exports.run = async function ({ api, event }) {
     const { join } = global.nodemodule["path"];
-    const { threadID } = event;
     const fs = require("fs");
+    const { createReadStream, existsSync, readdirSync } = global.nodemodule["fs-extra"];
+    const { threadID } = event;
 
-    // যদি বটকে অ্যাড করা হয়
+    // BOT ADD হলে
     if (event.logMessageData.addedParticipants.some(i => i.userFbId == api.getCurrentUserID())) {
         api.changeNickname(`[ ${global.config.PREFIX} ] • ${global.config.BOTNAME || ""}`, threadID, api.getCurrentUserID());
-        return api.sendMessage("", event.threadID, () =>
-            api.sendMessage({
-                body: `আসসালামুআলাইকুম🥀
+
+        return api.sendMessage({
+            body: `আসসালামুআলাইকুম🥀
 😈🥀😈
 ____________________________________
 🤖 BOT CONNECTED!!! 
@@ -46,19 +45,16 @@ ____________________________________
 যেকোনো অভিযোগ অথবা হেল্প এর জন্য আমার বস রাজ কে নক করতে পারেন 
 👉 Facebook: https://www.facebook.com/profile.php?id=61574869774986
 `,
-                attachment: fs.createReadStream(__dirname + "/JOY/mim.png")
-            }, threadID)
-        );
+            attachment: fs.createReadStream(__dirname + "/JOY/mim.png")
+        }, threadID);
     }
 
-    // যদি অন্য কেউ অ্যাড হয়
+    // নতুন মেম্বার ADD হলে
     try {
-        const { createReadStream, existsSync, readdirSync } = global.nodemodule["fs-extra"];
         let { threadName, participantIDs } = await api.getThreadInfo(threadID);
-
         const threadData = global.data.threadData.get(parseInt(threadID)) || {};
-        const path = join(__dirname, "cache", "joinGif");
-        const pathGif = join(path, `${threadID}.gif`);
+        const pathGif = join(__dirname, "cache", "joinGif", `${threadID}.gif`);
+        const randomGifFolder = join(__dirname, "cache", "joinGif", "randomgif");
 
         let mentions = [], nameArray = [], memLength = [], i = 0;
 
@@ -98,15 +94,14 @@ ____________________________________
             .replace(/\{soThanhVien}/g, memLength.join(', '))
             .replace(/\{threadName}/g, threadName);
 
-        const randomPath = readdirSync(join(__dirname, "cache", "joinGif", "randomgif"));
-
         let formPush;
+        const randomFiles = existsSync(randomGifFolder) ? readdirSync(randomGifFolder) : [];
+
         if (existsSync(pathGif)) {
             formPush = { body: msg, attachment: createReadStream(pathGif), mentions };
-        } else if (randomPath.length > 0) {
-            const pathRandom = join(__dirname, "cache", "joinGif", "randomgif",
-                randomPath[Math.floor(Math.random() * randomPath.length)]);
-            formPush = { body: msg, attachment: createReadStream(pathRandom), mentions };
+        } else if (randomFiles.length > 0) {
+            const randomFile = randomFiles[Math.floor(Math.random() * randomFiles.length)];
+            formPush = { body: msg, attachment: createReadStream(join(randomGifFolder, randomFile)), mentions };
         } else {
             formPush = { body: msg, mentions };
         }
@@ -115,4 +110,4 @@ ____________________________________
     } catch (e) {
         console.log(e);
     }
-			}
+};

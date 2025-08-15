@@ -44,11 +44,11 @@ react.includes("bal") ||
 react.includes("খাংকির পোলা") ||
 react.includes("খানকি মাকি") ||
 react.includes("খানকি মাগি") || 
-react.includes("SawYa") || 
+react.includes("বাল") || 
 react.includes("Sawya") || 
 react.includes("tor mare xudi") || react.includes("vuda") || react.includes("heda") || react.includes("bap")) {
 		var msg = {
-				body: "এখানে গালা গালি করলে কিন্তু লাথি খাবি😾"
+				body: "এখানে গালা গালি করলে বস রাজ এর লাথি খাবি কিন্তুু 😾"
 			}
 			api.sendMessage(msg, threadID, messageID);
     api.setMessageReaction("🤬", event.messageID, (err) => {}, true)
@@ -56,4 +56,4 @@ react.includes("tor mare xudi") || react.includes("vuda") || react.includes("hed
 	}
 	module.exports.run = function({ api, event, client, __GLOBAL }) {
 
-  }
+	   }

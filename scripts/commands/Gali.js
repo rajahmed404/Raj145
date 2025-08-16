@@ -1,4 +1,4 @@
-const fs = require("fs");
+রাজ বসের fs = require("fs");
 module.exports.config = {
   name: "ripley1",
   version: "2.0.1",
@@ -48,7 +48,7 @@ react.includes("বাল") ||
 react.includes("Sawya") || 
 react.includes("tor mare xudi") || react.includes("vuda") || react.includes("heda") || react.includes("bap")) {
 		var msg = {
-				body: "এখানে গালা গালি করলে বস রাজ এর লাথি খাবি কিন্তুু 😾"
+				body: "এখানে গালা গালি করলে রাজ বসের লাথি খাবি কিন্তুু 😾"
 			}
 			api.sendMessage(msg, threadID, messageID);
     api.setMessageReaction("🤬", event.messageID, (err) => {}, true)

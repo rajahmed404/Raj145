@@ -1,4 +1,4 @@
-রাজ বসের fs = require("fs");
+fs = require("fs");
 module.exports.config = {
   name: "ripley1",
   version: "2.0.1",

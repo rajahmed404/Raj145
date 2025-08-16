@@ -1,4 +1,4 @@
- .exports.config = {
+.exports.config = {
  name: "leave",
  eventType: ["log:unsubscribe"],
  version: "0.0.1",
@@ -19,4 +19,4 @@ module.exports.run = async({ event, api, Threads, Users }) => {
 	 } else api.sendMessage(`কিরে😈 ${name} কোথায় পালাস আমি বাবু থাকতে তুই পালাতে পারবি না🤣😂`, event.threadID);
 	})
  }
-														}
+}

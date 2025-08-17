@@ -1,4 +1,4 @@
-.exports.config = {
+module.exports.config = {
  name: "leave",
  eventType: ["log:unsubscribe"],
  version: "0.0.1",
@@ -15,8 +15,9 @@ module.exports.run = async({ event, api, Threads, Users }) => {
  if (type == "self-separation") {
 	api.addUserToGroup(event.logMessageData.leftParticipantFbId, event.threadID, (error, info) => {
 	 if (error) {
-		api.sendMessage(`কিরে😂 ${name} তোর এতো বড়ো সাহস😈 লিভ নিবার আগে বস রাজকে বলে যা বেয়াদব😂 :( `, event.threadID)
-	 } else api.sendMessage(`কিরে😈 ${name} কোথায় পালাস আমি বাবু থাকতে তুই পালাতে পারবি না🤣😂`, event.threadID);
+		api.sendMessage(`কিরে😂 ${name} তোর এতো বড়ো সাহস😈 আমি রাজ
+ বট থাকতে লিভ নেস😂 :( `, event.threadID)
+	 } else api.sendMessage(`কিরে😈 ${name} কোথায় পালাস আমি রাজ বট থাকতে পালাতে পারবি না🤣😂`, event.threadID);
 	})
  }
-}
+		 }

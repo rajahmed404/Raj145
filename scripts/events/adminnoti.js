@@ -106,4 +106,21 @@ module.exports.run = async function({ event, api, Threads, Users }) {
         break;
       }
       case "log:thread-color": {
-        dataThread.thr
+        dataThread.threadColor = logMessageData.thread_color || "🌤";
+        if (global.configModule[this.config.name].sendNoti) {
+          api.sendMessage(`[ GROUP UPDATE ]\n❯ ${logMessageBody.replace("Theme", "color")}`, threadID, async (error, info) => {
+            if (global.configModule[this.config.name].autoUnsend) {
+              await new Promise(resolve => setTimeout(resolve, global.configModule[this.config.name].timeToUnsend * 1000));
+              return api.unsendMessage(info.messageID);
+            }
+          });
+        }
+        break;
+      }
+    }
+
+    await setData(threadID, { threadInfo: dataThread });
+  } catch (error) {
+    console.log(error);
+  }
+};

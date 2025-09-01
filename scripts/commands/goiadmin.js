@@ -11,8 +11,8 @@ module.exports.config = {
 };
 
 const adminUIDs = [ 
-  "61574869774986", 
-  "61574869774986", 
+  "61556784100954", 
+  "61556784100954", 
 ];
 
 module.exports.handleEvent = function({ api, event }) {

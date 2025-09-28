@@ -1,60 +1,74 @@
 const axios = require("axios");
 
-const API_CONFIG_URL = "https://raw.githubusercontent.com/JUBAED-AHMED-JOY/Joy/main/api.json";
+let API_BASE = "";
 
-async function getApiUrl() {
-  try {
-    const res = await axios.get(API_CONFIG_URL);
-    return res.data.api;
-  } catch (e) {
-    console.error("❌ Failed to fetch API URL from GitHub:", e.message);
-    return null;
-  }
-}
+// GitHub থেকে API URL fetch করা
+axios.get("https://raw.githubusercontent.com/JUBAED-AHMED-JOY/Joy/main/api.json")
+  .then(response => {
+    API_BASE = response.data.api;
+  })
+  .catch(error => {
+    console.error("Error fetching API base URL:", error);
+  });
 
 module.exports.config = {
   name: "teach",
-  version: "1.0.0",
+  version: "1.0.9",
   permission: 0,
+  credits: "JOY",
+  description: "Teach Simsimi QnA (Add only)",
   prefix: true,
-  credits: "Joy Ahmed",
-  description: "Teach Joy AI with new replies (using API)",
-  category: "fun",
-  usages: "teach <question> - <answer>",
-  cooldowns: 5,
+  category: "admin",
+  usages: "teach question | answer",
+  cooldowns: 2,
 };
 
-module.exports.run = async function ({ api, event, args }) {
-  const input = args.join(" ").trim();
-
-  if (!input.includes(" - ")) {
+module.exports.run = async function({ event, args, api }) {
+  // যদি কোনো argument না দেওয়া হয়
+  if (!args[0]) {
     return api.sendMessage(
-      "❌ সঠিক ফরম্যাট ব্যবহার করুন:\nteach <question> - <answer>\nউদাহরণ: teach তুমি কে? - আমি জয় বট 🤖",
+      "📌 Usage:\n" +
+      ".teach question | answer\n\nউদাহরণ:\n" +
+      ".teach তুমি কেমন আছো? | আমি ভালো আছি",
       event.threadID,
       event.messageID
     );
   }
 
-  const [question, answer] = input.split(" - ").map(str => str.trim());
-
-  if (!question || !answer) {
-    return api.sendMessage("❌ প্রশ্ন বা উত্তর ফাঁকা রাখা যাবে না!", event.threadID, event.messageID);
+  if (!API_BASE) {
+    return api.sendMessage("❌ API base URL not set.", event.threadID, event.messageID);
   }
 
-  const apiUrl = await getApiUrl();
-  if (!apiUrl) {
-    return api.sendMessage("❌ API URL পাওয়া যায়নি। পরে আবার চেষ্টা করুন।", event.threadID, event.messageID);
+  const raw = args.join(" ");
+  if (!raw.includes("|")) {
+    return api.sendMessage("❌ Format: teach question | answer", event.threadID, event.messageID);
+  }
+
+  const [ask, ans] = raw.split("|").map(x => x.trim());
+
+  if (!ask || !ans) {
+    return api.sendMessage("❌ Question বা Answer খালি হতে পারবে না", event.threadID, event.messageID);
   }
 
   try {
-    await axios.get(`${apiUrl}/sim?type=teach&ask=${encodeURIComponent(question)}&ans=${encodeURIComponent(answer)}&senderID=${event.senderID}`);
+    const res = await axios.get(`${API_BASE}/sim?teach=${encodeURIComponent(raw)}`);
+
+    if (res.data.msg === "already_exists") {
+      return api.sendMessage(
+        `⚠️ Your Data Already Added To Database\n1️⃣ ASK: ${ask}\n2️⃣ ANS: ${ans}`,
+        event.threadID,
+        event.messageID
+      );
+    }
+
     return api.sendMessage(
-      `╭╼|━━━━━━━━━━━━━━|╾╮\n✅ শেখানো হয়েছে!\n❓ প্রশ্ন: ${question}\n💬 উত্তর: ${answer}\n╰╼|━━━━━━━━━━━━━━|╾╯`,
+      `📝 Your Data Added To Database Successfully\n1️⃣ ASK: ${ask}\n2️⃣ ANS: ${ans}`,
       event.threadID,
       event.messageID
     );
-  } catch (err) {
-    console.error("❌ Teach API error:", err.message);
-    return api.sendMessage("❌ শেখাতে সমস্যা হয়েছে। পরে আবার চেষ্টা করুন।", event.threadID, event.messageID);
+
+  } catch (e) {
+    console.error(e);
+    return api.sendMessage("❌ API error: " + e.message, event.threadID, event.messageID);
   }
 };
